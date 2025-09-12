@@ -89,17 +89,16 @@
 
     <script>
         // --- 운동 데이터 정의 ---
-        const routine = [
+        let routine = [
             { id: 'warmup-1', name: '준비운동: 팔 돌리기', type: 'reps', count: '앞/뒤 각 10회', description: '어깨 관절을 부드럽게 풀어줍니다. 천천히 큰 원을 그리세요.' },
             { id: 'warmup-2', name: '준비운동: 허리 돌리기', type: 'reps', count: '좌/우 각 10회', description: '허리와 골반의 긴장을 풀어줍니다.' },
             { id: 'warmup-3', name: '준비운동: 제자리 뛰기', type: 'time', count: 60, description: '몸에 열을 내고 심박수를 서서히 올립니다.' },
             { id: 'main-1', name: '스쿼트', type: 'reps', count: '20회', description: '허리를 편 채 투명 의자에 앉듯 내려갑니다. 무릎이 발끝을 넘지 않게 주의하세요.' },
             { id: 'main-2', name: '무릎 대고 푸시업', type: 'reps', count: '10회', description: '머리부터 무릎까지 일직선을 유지하며 가슴을 바닥으로 내립니다. 배에 힘을 주세요.' },
             { id: 'main-3', name: '플랭크', type: 'time', count: 30, description: '머리부터 발끝까지 일직선을 유지합니다. 엉덩이가 처지거나 솟지 않게 주의하세요.' },
-            // --- [추가됨] 등 운동 루틴 ---
             { id: 'main-back-1', name: '슈퍼맨', type: 'reps', count: '15회', description: '팔과 다리를 동시에 들어올려 등과 엉덩이 근육을 자극합니다. 시선은 바닥을 향하세요.' },
             { id: 'main-back-2', name: '브릿지', type: 'reps', count: '15회', description: '엉덩이를 들어올려 어깨부터 무릎까지 일직선을 만듭니다. 엉덩이 근육에 집중하세요.' },
-            { id: 'main-4', name: '버피 테스트 (초보자 버전)', type: 'reps', count: '10회', description: '점프 없이 한 발씩 움직여 전신 근육을 사용합니다. 체지방 감소에 효과적입니다.' },
+            { id: 'main-4', name: '버피 테스트', type: 'reps', count: '10회', description: '가슴을 바닥에 닿게 엎드린 후, 일어나 가볍게 점프합니다. 전신 폭발력을 사용하는 운동입니다.' },
             { id: 'main-5', name: '팔 벌려 뛰기', type: 'reps', count: '30회', description: '가볍고 경쾌한 리듬으로 심박수를 유지합니다.' },
             { id: 'rest', name: '세트 간 휴식', type: 'time', count: 120, description: '호흡을 고르고 물을 마시며 다음 세트를 준비합니다. 충분히 쉬어주세요.' },
             { id: 'cooldown-1', name: '마무리: 허벅지 스트레칭', type: 'time', count: 30, description: '운동한 허벅지 앞쪽과 뒤쪽 근육을 천천히 늘려줍니다.' },
@@ -123,10 +122,30 @@
         let currentExerciseIndex = 0;
         let workoutInProgress = false;
         let timerInterval;
+        let audioCtx;
 
-        // --- 함수 정의 ---
+        // --- 타이머 종료 알림음 재생 함수 ---
+        function playBeep() {
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.error("Web Audio API is not supported in this browser");
+                    return;
+                }
+            }
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + 0.15);
+        }
 
-        // 운동 목록을 화면에 렌더링하는 함수
+        // 운동 목록 렌더링 함수
         function renderRoutine() {
             routineList.innerHTML = '';
             let sectionTitle = '';
@@ -164,7 +183,6 @@
                         updateDisplay();
                     }
                 });
-
                 routineList.appendChild(div);
             });
         }
@@ -184,14 +202,13 @@
 
             if (setToStandard) {
                 routine[pushupIndex].name = '정자세 푸시업';
-                routine[pushupIndex].description = '마지막 세트! 무릎을 떼고 정자세에 도전해보세요. 몸을 일직선으로 유지하는 것이 중요합니다.';
+                routine[pushupIndex].description = '2세트부터 정자세 도전! 무릎을 떼고 몸을 일직선으로 유지하는 것이 중요합니다.';
             } else {
                 routine[pushupIndex].name = '무릎 대고 푸시업';
                 routine[pushupIndex].description = '머리부터 무릎까지 일직선을 유지하며 가슴을 바닥으로 내립니다. 배에 힘을 주세요.';
             }
             updateCardContent('main-2');
         }
-
 
         function updateDisplay() {
             document.querySelectorAll('.workout-card').forEach(card => {
@@ -215,15 +232,12 @@
             }
 
             const exercise = routine[currentExerciseIndex];
-
             const currentCard = document.getElementById(exercise.id);
             if (currentCard) {
                 currentCard.classList.add('active');
                 currentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-
             currentExerciseTitle.textContent = exercise.name;
-
             if (exercise.type === 'time') {
                 timerContainer.classList.remove('hidden');
                 startTimer(exercise.count);
@@ -243,9 +257,11 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    nextBtn.click();
+                    playBeep();
+                    setTimeout(() => nextBtn.click(), 500);
+                } else {
+                    timeLeft--;
                 }
-                timeLeft--;
             }
             update();
             timerInterval = setInterval(update, 1000);
@@ -255,18 +271,18 @@
             const lastExercise = routine[currentExerciseIndex];
             currentExerciseIndex++;
 
-            if (lastExercise.id === 'main-5') {
+            if (lastExercise.id === 'main-5') { // 본운동 마지막
                 if (currentSet < totalSets) {
                     currentExerciseIndex = routine.findIndex(ex => ex.id === 'rest');
                 } else {
                     currentExerciseIndex = routine.findIndex(ex => ex.id === 'cooldown-1');
                 }
             }
-            else if (lastExercise.id === 'rest') {
+            else if (lastExercise.id === 'rest') { // 휴식 끝
                 currentSet++;
                 if (currentSet <= totalSets) {
                     currentSetInfo.textContent = `총 ${totalSets}세트 중 ${currentSet}세트 진행`;
-                    if (currentSet === totalSets) {
+                    if (currentSet >= 2) {
                         setPushupState(true);
                     }
                     currentExerciseIndex = routine.findIndex(ex => ex.id === 'main-1');
@@ -280,13 +296,10 @@
                 workoutInProgress = true;
                 currentSet = 1;
                 currentExerciseIndex = 0;
-
                 setPushupState(false);
-
                 startBtn.classList.add('hidden');
                 nextBtn.classList.remove('hidden');
                 completionMessage.classList.add('hidden');
-
                 currentSetInfo.textContent = `총 ${totalSets}세트 중 ${currentSet}세트 진행`;
                 updateDisplay();
             }
