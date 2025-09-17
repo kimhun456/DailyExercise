@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>오늘부터 시작! 맨몸 운동 루틴</title>
+    <title>현재의 홈트레이닝</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -50,7 +50,7 @@
     <div class="container mx-auto p-4 md:p-8 max-w-4xl">
         <!-- Header -->
         <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-2">🔥 왕초보 탈출 프로젝트</h1>
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-2">🔥 현재의 홈트레이닝</h1>
             <p class="text-lg text-slate-600">오늘의 맨몸 운동 루틴을 시작하고 건강한 변화를 만들어보세요!</p>
         </header>
 
@@ -90,19 +90,24 @@
     <script>
         // --- 운동 데이터 정의 ---
         let routine = [
-            { id: 'warmup-1', name: '준비운동: 팔 돌리기', type: 'reps', count: '앞/뒤 각 10회', description: '어깨 관절을 부드럽게 풀어줍니다. 천천히 큰 원을 그리세요.' },
-            { id: 'warmup-2', name: '준비운동: 허리 돌리기', type: 'reps', count: '좌/우 각 10회', description: '허리와 골반의 긴장을 풀어줍니다.' },
-            { id: 'warmup-3', name: '준비운동: 제자리 뛰기', type: 'time', count: 60, description: '몸에 열을 내고 심박수를 서서히 올립니다.' },
-            { id: 'main-1', name: '스쿼트', type: 'reps', count: '20회', description: '허리를 편 채 투명 의자에 앉듯 내려갑니다. 무릎이 발끝을 넘지 않게 주의하세요.' },
-            { id: 'main-2', name: '무릎 대고 푸시업', type: 'reps', count: '10회', description: '머리부터 무릎까지 일직선을 유지하며 가슴을 바닥으로 내립니다. 배에 힘을 주세요.' },
+            // --- [수정됨] 준비운동(동적 스트레칭) 구체화 ---
+            { id: 'warmup-1', name: '준비운동: 고양이-소 자세', type: 'reps', count: '10회', description: '등과 허리를 부드럽게 움직여 척추를 풀어줍니다.' },
+            { id: 'warmup-2', name: '준비운동: 레그 스윙', type: 'reps', count: '좌/우 각 10회', description: '고관절과 허벅지 근육을 동적으로 스트레칭합니다. (앞/뒤로 흔들기)' },
+            { id: 'warmup-3', name: '준비운동: 몸통 비틀기', type: 'reps', count: '20회', description: '허리를 좌우로 부드럽게 회전시켜 코어를 활성화합니다.' },
+            { id: 'warmup-4', name: '준비운동: 제자리 뛰기', type: 'time', count: 60, description: '심박수를 서서히 올려 몸에 열을 냅니다.' },
+            { id: 'main-1', name: '템포 스쿼트', type: 'reps', count: '20회', description: '3초간 천천히 내려가고, 1초 멈춘 후, 1초 만에 일어납니다. 자극에 집중하세요.' },
+            { id: 'main-2', name: '정자세 푸시업', type: 'reps', count: '10회', description: '무릎을 떼고 몸을 일직선으로 유지하며 가슴을 바닥으로 내립니다. 배에 힘을 주세요.' },
             { id: 'main-3', name: '플랭크', type: 'time', count: 30, description: '머리부터 발끝까지 일직선을 유지합니다. 엉덩이가 처지거나 솟지 않게 주의하세요.' },
             { id: 'main-back-1', name: '슈퍼맨', type: 'reps', count: '15회', description: '팔과 다리를 동시에 들어올려 등과 엉덩이 근육을 자극합니다. 시선은 바닥을 향하세요.' },
             { id: 'main-back-2', name: '브릿지', type: 'reps', count: '15회', description: '엉덩이를 들어올려 어깨부터 무릎까지 일직선을 만듭니다. 엉덩이 근육에 집중하세요.' },
             { id: 'main-4', name: '버피 테스트', type: 'reps', count: '10회', description: '가슴을 바닥에 닿게 엎드린 후, 일어나 가볍게 점프합니다. 전신 폭발력을 사용하는 운동입니다.' },
             { id: 'main-5', name: '팔 벌려 뛰기', type: 'reps', count: '30회', description: '가볍고 경쾌한 리듬으로 심박수를 유지합니다.' },
             { id: 'rest', name: '세트 간 휴식', type: 'time', count: 120, description: '호흡을 고르고 물을 마시며 다음 세트를 준비합니다. 충분히 쉬어주세요.' },
-            { id: 'cooldown-1', name: '마무리: 허벅지 스트레칭', type: 'time', count: 30, description: '운동한 허벅지 앞쪽과 뒤쪽 근육을 천천히 늘려줍니다.' },
-            { id: 'cooldown-2', name: '마무리: 가슴/어깨 스트레칭', type: 'time', count: 30, description: '깍지를 끼고 팔을 뒤로 뻗어 가슴과 어깨를 활짝 열어줍니다.' }
+            // --- [수정됨] 마무리 운동(정적 스트레칭) 구체화 ---
+            { id: 'cooldown-1', name: '마무리: 이상근 스트레칭', type: 'time', count: 60, description: '누워서 한쪽 발목을 반대쪽 무릎에 올리고 당겨 엉덩이 근육을 늘려줍니다. (좌/우 각 30초)' },
+            { id: 'cooldown-2', name: '마무리: 햄스트링 스트레칭', type: 'time', count: 60, description: '앉아서 한쪽 다리를 펴고 상체를 숙여 허벅지 뒤쪽을 스트레칭합니다. (좌/우 각 30초)' },
+            { id: 'cooldown-3', name: '마무리: 가슴/어깨 스트레칭', type: 'time', count: 30, description: '깍지를 끼고 팔을 뒤로 뻗어 가슴과 어깨 앞쪽을 활짝 열어줍니다.' },
+            { id: 'cooldown-4', name: '마무리: 아기 자세', type: 'time', count: 60, description: '무릎을 꿇고 엎드려 등과 어깨의 긴장을 풀며 깊게 호흡합니다.' }
         ];
 
         // --- DOM 요소 가져오기 ---
@@ -187,29 +192,6 @@
             });
         }
 
-        function updateCardContent(exerciseId) {
-            const card = document.getElementById(exerciseId);
-            const exerciseData = routine.find(ex => ex.id === exerciseId);
-            if (card && exerciseData) {
-                card.querySelector('h4').textContent = exerciseData.name;
-                card.querySelector('p').textContent = exerciseData.description;
-            }
-        }
-
-        function setPushupState(setToStandard) {
-            const pushupIndex = routine.findIndex(ex => ex.id === 'main-2');
-            if (pushupIndex === -1) return;
-
-            if (setToStandard) {
-                routine[pushupIndex].name = '정자세 푸시업';
-                routine[pushupIndex].description = '2세트부터 정자세 도전! 무릎을 떼고 몸을 일직선으로 유지하는 것이 중요합니다.';
-            } else {
-                routine[pushupIndex].name = '무릎 대고 푸시업';
-                routine[pushupIndex].description = '머리부터 무릎까지 일직선을 유지하며 가슴을 바닥으로 내립니다. 배에 힘을 주세요.';
-            }
-            updateCardContent('main-2');
-        }
-
         function updateDisplay() {
             document.querySelectorAll('.workout-card').forEach(card => {
                 card.classList.remove('active');
@@ -282,9 +264,6 @@
                 currentSet++;
                 if (currentSet <= totalSets) {
                     currentSetInfo.textContent = `총 ${totalSets}세트 중 ${currentSet}세트 진행`;
-                    if (currentSet >= 2) {
-                        setPushupState(true);
-                    }
                     currentExerciseIndex = routine.findIndex(ex => ex.id === 'main-1');
                 }
             }
@@ -296,7 +275,6 @@
                 workoutInProgress = true;
                 currentSet = 1;
                 currentExerciseIndex = 0;
-                setPushupState(false);
                 startBtn.classList.add('hidden');
                 nextBtn.classList.remove('hidden');
                 completionMessage.classList.add('hidden');
