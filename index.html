@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,40 +10,42 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-
         .workout-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
         }
-
         .workout-card.active {
             transform: translateY(-10px) scale(1.03);
             box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
             border-color: #3b82f6;
         }
-
-        .workout-card.clickable {
-            cursor: pointer;
-        }
-
         .timer-display {
             font-size: 4rem;
             line-height: 1;
         }
-
         .btn {
             transition: all 0.2s ease;
         }
-
         .btn:hover {
             transform: translateY(-2px);
         }
-
         .btn:active {
             transform: translateY(0);
         }
+        /* Modal styles */
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+        #modal-description ol {
+            text-align: left;
+            margin-left: 1.5rem;
+            list-style-type: decimal;
+        }
+        #modal-description li {
+            margin-bottom: 0.5rem;
+        }
     </style>
 </head>
-
 <body class="bg-slate-50 text-slate-800">
 
     <div class="container mx-auto p-4 md:p-8 max-w-4xl">
@@ -62,20 +63,18 @@
                     <p id="current-set-info" class="text-slate-500">총 3세트 중 1세트 준비</p>
                 </div>
                 <div id="timer-container" class="hidden text-center">
-                    <div id="timer-display" class="timer-display font-bold text-slate-800">00:00</div>
+                     <div id="timer-display" class="timer-display font-bold text-slate-800">00:00</div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button id="start-btn"
-                        class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md">
+                    <button id="start-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md">
                         운동 시작
                     </button>
-                    <button id="next-btn"
-                        class="btn bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-lg shadow-md hidden">
+                    <button id="next-btn" class="btn bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-lg shadow-md hidden">
                         다음 운동
                     </button>
                 </div>
             </div>
-            <div id="completion-message" class="hidden mt-4 p-4 bg-green-100 text-green-800 rounded-lg text-center">
+             <div id="completion-message" class="hidden mt-4 p-4 bg-green-100 text-green-800 rounded-lg text-center">
                 <p class="font-bold text-lg">🎉 정말 대단해요! 오늘의 운동을 모두 완료했습니다!</p>
                 <p>꾸준함이 가장 중요합니다. 내일도 화이팅!</p>
             </div>
@@ -87,27 +86,36 @@
         </div>
     </div>
 
+    <!-- 상세 설명 Modal -->
+    <div id="exercise-modal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center transform scale-95 transition-transform max-h-[90vh] overflow-y-auto">
+            <h3 id="modal-title" class="text-2xl font-bold mb-4 text-slate-800"></h3>
+            <div id="modal-description" class="text-slate-600 mb-6"></div>
+            <button id="modal-close-btn" class="btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+                닫기
+            </button>
+        </div>
+    </div>
+
     <script>
-        // --- 운동 데이터 정의 ---
+        // --- 운동 데이터 정의 (상세 설명으로 변경) ---
         let routine = [
-            // --- [수정됨] 준비운동(동적 스트레칭) 구체화 ---
-            { id: 'warmup-1', name: '준비운동: 고양이-소 자세', type: 'reps', count: '10회', description: '등과 허리를 부드럽게 움직여 척추를 풀어줍니다.' },
-            { id: 'warmup-2', name: '준비운동: 레그 스윙', type: 'reps', count: '좌/우 각 10회', description: '고관절과 허벅지 근육을 동적으로 스트레칭합니다. (앞/뒤로 흔들기)' },
-            { id: 'warmup-3', name: '준비운동: 몸통 비틀기', type: 'reps', count: '20회', description: '허리를 좌우로 부드럽게 회전시켜 코어를 활성화합니다.' },
-            { id: 'warmup-4', name: '준비운동: 제자리 뛰기', type: 'time', count: 60, description: '심박수를 서서히 올려 몸에 열을 냅니다.' },
-            { id: 'main-1', name: '템포 스쿼트', type: 'reps', count: '20회', description: '3초간 천천히 내려가고, 1초 멈춘 후, 1초 만에 일어납니다. 자극에 집중하세요.' },
-            { id: 'main-2', name: '정자세 푸시업', type: 'reps', count: '10회', description: '무릎을 떼고 몸을 일직선으로 유지하며 가슴을 바닥으로 내립니다. 배에 힘을 주세요.' },
-            { id: 'main-3', name: '플랭크', type: 'time', count: 30, description: '머리부터 발끝까지 일직선을 유지합니다. 엉덩이가 처지거나 솟지 않게 주의하세요.' },
-            { id: 'main-back-1', name: '슈퍼맨', type: 'reps', count: '15회', description: '팔과 다리를 동시에 들어올려 등과 엉덩이 근육을 자극합니다. 시선은 바닥을 향하세요.' },
-            { id: 'main-back-2', name: '브릿지', type: 'reps', count: '15회', description: '엉덩이를 들어올려 어깨부터 무릎까지 일직선을 만듭니다. 엉덩이 근육에 집중하세요.' },
-            { id: 'main-4', name: '버피 테스트', type: 'reps', count: '10회', description: '가슴을 바닥에 닿게 엎드린 후, 일어나 가볍게 점프합니다. 전신 폭발력을 사용하는 운동입니다.' },
-            { id: 'main-5', name: '팔 벌려 뛰기', type: 'reps', count: '30회', description: '가볍고 경쾌한 리듬으로 심박수를 유지합니다.' },
-            { id: 'rest', name: '세트 간 휴식', type: 'time', count: 120, description: '호흡을 고르고 물을 마시며 다음 세트를 준비합니다. 충분히 쉬어주세요.' },
-            // --- [수정됨] 마무리 운동(정적 스트레칭) 구체화 ---
-            { id: 'cooldown-1', name: '마무리: 이상근 스트레칭', type: 'time', count: 60, description: '누워서 한쪽 발목을 반대쪽 무릎에 올리고 당겨 엉덩이 근육을 늘려줍니다. (좌/우 각 30초)' },
-            { id: 'cooldown-2', name: '마무리: 햄스트링 스트레칭', type: 'time', count: 60, description: '앉아서 한쪽 다리를 펴고 상체를 숙여 허벅지 뒤쪽을 스트레칭합니다. (좌/우 각 30초)' },
-            { id: 'cooldown-3', name: '마무리: 가슴/어깨 스트레칭', type: 'time', count: 30, description: '깍지를 끼고 팔을 뒤로 뻗어 가슴과 어깨 앞쪽을 활짝 열어줍니다.' },
-            { id: 'cooldown-4', name: '마무리: 아기 자세', type: 'time', count: 60, description: '무릎을 꿇고 엎드려 등과 어깨의 긴장을 풀며 깊게 호흡합니다.' }
+            { id: 'warmup-1', name: '준비운동: 고양이-소 자세', type: 'reps', count: '10회', description: '<ol><li>네 발 기기 자세를 만듭니다. (어깨 아래 손목, 골반 아래 무릎)</li><li>숨을 들이마시며 허리를 오목하게 만들고, 시선은 천장을 향합니다. (소 자세)</li><li>숨을 내쉬면서 등을 동그랗게 말아 올리고, 시선은 배꼽을 향합니다. (고양이 자세)</li><li>이 두 동작을 부드럽게 반복하며 척추를 풀어줍니다.</li></ol>' },
+            { id: 'warmup-2', name: '준비운동: 레그 스윙', type: 'reps', count: '좌/우 각 10회', description: '<ol><li>벽이나 의자를 잡고 균형을 잡습니다.</li><li>한쪽 다리를 앞뒤로 그네처럼 부드럽게 흔들어줍니다.</li><li>점점 범위를 넓혀 고관절이 풀리는 것을 느낍니다.</li><li>반대쪽 다리도 똑같이 반복합니다.</li></ol>' },
+            { id: 'warmup-3', name: '준비운동: 몸통 비틀기', type: 'reps', count: '20회', description: '<ol><li>다리를 어깨너비로 벌리고 편안하게 섭니다.</li><li>양팔에 힘을 빼고, 몸통을 좌우로 부드럽게 회전시킵니다.</li><li>팔이 몸통을 자연스럽게 감싸도록 움직이며 코어를 예열합니다.</li></ol>' },
+            { id: 'warmup-4', name: '준비운동: 제자리 뛰기', type: 'time', count: 60, description: '<ol><li>가볍게 제자리에서 달리기를 시작합니다.</li><li>몸에 열이 나고 심박수가 서서히 오르는 것을 느낍니다.</li></ol>' },
+            { id: 'main-1', name: '템포 스쿼트', type: 'reps', count: '20회', description: '<ol><li>발을 어깨너비로 벌리고 섭니다.</li><li>(하나, 둘, 셋) 3초 동안 천천히 허벅지가 바닥과 평행이 될 때까지 앉습니다.</li><li>(넷) 가장 낮은 자세에서 1초간 완벽하게 멈춥니다.</li><li>(다섯) 1초 만에 폭발적으로 일어나 시작 자세로 돌아옵니다. 허리가 아닌 엉덩이와 허벅지 힘에 집중하세요.</li></ol>' },
+            { id: 'main-2', name: '정자세 푸시업', type: 'reps', count: '10회', description: '<ol><li>손을 어깨보다 조금 넓게 짚고, 머리부터 발끝까지 일직선을 만듭니다.</li><li>복부에 힘을 줘 허리가 처지지 않도록 유지합니다.</li><li>가슴이 바닥에 닿기 직전까지 팔을 굽혀 내려갑니다.</li><li>바닥을 강하게 밀어 시작 자세로 돌아옵니다.</li></ol>' },
+            { id: 'main-3', name: '플랭크', type: 'time', count: 30, description: '<ol><li>팔꿈치를 어깨 바로 아래에 두고 바닥에 댑니다.</li><li>머리부터 발끝까지 몸이 일직선이 되도록 합니다.</li><li>엉덩이가 솟거나 처지지 않도록 복부와 엉덩이에 강하게 힘을 주고 버팁니다.</li><li>숨을 참지 말고 편안하게 호흡합니다.</li></ol>' },
+            { id: 'main-back-1', name: '슈퍼맨', type: 'reps', count: '15회', description: '<ol><li>바닥에 배를 대고 엎드려 양팔을 앞으로 뻗습니다.</li><li>숨을 내쉬면서 팔과 다리를 동시에 들어 올립니다.</li><li>허리 힘보다는 등과 엉덩이 근육을 조이는 느낌에 집중합니다.</li><li>최고 지점에서 1~2초 멈춘 후 천천히 내려옵니다.</li></ol>' },
+            { id: 'main-back-2', name: '브릿지', type: 'reps', count: '15회', description: '<ol><li>바닥에 누워 무릎을 세웁니다.</li><li>숨을 내쉬면서 엉덩이를 들어 올려 어깨부터 무릎까지 일직선을 만듭니다.</li><li>최고 지점에서 엉덩이를 강하게 조여 1~2초 멈춥니다.</li><li>허리가 과하게 꺾이지 않도록 주의하며 천천히 내려옵니다.</li></ol>' },
+            { id: 'main-4', name: '버피 테스트', type: 'reps', count: '10회', description: '<ol><li>서 있는 자세에서 바닥에 손을 짚습니다.</li><li>점프하여 다리를 뒤로 뻗어 푸시업 자세를 만듭니다.</li><li>푸시업을 1회 실시합니다. (가슴이 바닥에 닿도록)</li><li>다시 점프하여 다리를 가슴 쪽으로 당깁니다.</li><li>일어나면서 머리 위로 가볍게 점프합니다.</li></ol>' },
+            { id: 'main-5', name: '팔 벌려 뛰기', type: 'reps', count: '30회', description: '<ol><li>차렷 자세에서 시작합니다.</li><li>점프하며 양팔은 머리 위로, 다리는 어깨너비보다 넓게 벌립니다.</li><li>다시 점프하며 시작 자세로 돌아옵니다.</li></ol>' },
+            { id: 'rest', name: '세트 간 휴식', type: 'time', count: 120, description: '<ol><li>가만히 서 있기보다 가볍게 걸으며 호흡을 고릅니다.</li><li>물을 마셔 수분을 보충합니다.</li></ol>' },
+            { id: 'cooldown-1', name: '마무리: 이상근 스트레칭', type: 'time', count: 60, description: '<ol><li>바닥에 누워 무릎을 세웁니다.</li><li>오른쪽 발목을 왼쪽 무릎 위에 올려 숫자 4 모양을 만듭니다.</li><li>양손으로 왼쪽 허벅지 뒤를 잡고 가슴 쪽으로 당깁니다.</li><li>오른쪽 엉덩이 깊은 곳이 늘어나는 것을 느끼며 30초 유지 후, 반대쪽도 반복합니다.</li></ol>' },
+            { id: 'cooldown-2', name: '마무리: 햄스트링 스트레칭', type: 'time', count: 60, description: '<ol><li>바닥에 앉아 오른쪽 다리를 앞으로 폅니다.</li><li>허리를 편 상태로 상체를 앞으로 숙여 오른쪽 허벅지 뒤쪽을 늘립니다.</li><li>30초 유지 후, 반대쪽도 반복합니다.</li></ol>' },
+            { id: 'cooldown-3', name: '마무리: 가슴/어깨 스트레칭', type: 'time', count: 30, description: '<ol><li>등 뒤로 깍지를 끼고, 가슴을 활짝 열어줍니다.</li><li>깍지 낀 손을 위로 들어 올리며 어깨 앞쪽과 가슴을 늘립니다.</li></ol>' },
+            { id: 'cooldown-4', name: '마무리: 아기 자세', type: 'time', count: 60, description: '<ol><li>무릎을 꿇고 앉아 상체를 숙여 이마를 바닥에 댑니다.</li><li>온몸의 긴장을 풀고 등과 허리를 이완시키며 깊게 호흡합니다.</li></ol>' }
         ];
 
         // --- DOM 요소 가져오기 ---
@@ -120,6 +128,10 @@
         const nextBtn = document.getElementById('next-btn');
         const routineList = document.getElementById('routine-list');
         const completionMessage = document.getElementById('completion-message');
+        const modal = document.getElementById('exercise-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDescription = document.getElementById('modal-description');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
 
         // --- 상태 변수 ---
         let currentSet = 1;
@@ -127,34 +139,25 @@
         let currentExerciseIndex = 0;
         let workoutInProgress = false;
         let timerInterval;
-        let audioCtx;
 
-        // --- 타이머 종료 알림음 재생 함수 ---
-        function playBeep() {
-            if (!audioCtx) {
-                try {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                } catch (e) {
-                    console.error("Web Audio API is not supported in this browser");
-                    return;
-                }
-            }
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
-            gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-            oscillator.start(audioCtx.currentTime);
-            oscillator.stop(audioCtx.currentTime + 0.15);
+        // --- Modal 함수 ---
+        function openModal(exercise) {
+            modalTitle.textContent = exercise.name;
+            modalDescription.innerHTML = exercise.description;
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('scale-95');
         }
 
+        function closeModal() {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.add('scale-95');
+        }
+        
         // 운동 목록 렌더링 함수
         function renderRoutine() {
             routineList.innerHTML = '';
             let sectionTitle = '';
-
+            
             routine.forEach((exercise, index) => {
                 let currentSection = '';
                 if (exercise.id.startsWith('warmup')) currentSection = '준비운동';
@@ -172,20 +175,36 @@
 
                 const div = document.createElement('div');
                 div.id = exercise.id;
-                div.className = 'workout-card bg-white p-5 rounded-xl border-2 border-transparent shadow-sm';
+                div.className = 'workout-card bg-white p-5 rounded-xl border-2 border-transparent shadow-sm hover:shadow-lg hover:border-blue-500';
+                
+                const briefDescription = exercise.description.includes('<li>') ? exercise.description.split('<li>')[1].split('</li>')[0] : exercise.description;
+
                 div.innerHTML = `
                     <div class="flex justify-between items-center">
                         <h4 class="text-xl font-semibold">${exercise.name}</h4>
                         <span class="text-lg font-bold text-blue-500">${exercise.type === 'reps' ? exercise.count : `${exercise.count}초`}</span>
                     </div>
-                    <p class="text-slate-600 mt-2">${exercise.description}</p>
+                    <p class="text-slate-600 mt-2 truncate">${briefDescription}</p>
                 `;
-
+                
+                // --- [수정됨] 스마트 클릭 이벤트 리스너 ---
                 div.addEventListener('click', () => {
+                    // 운동 진행 중일 때
                     if (workoutInProgress) {
-                        clearInterval(timerInterval);
-                        currentExerciseIndex = index;
-                        updateDisplay();
+                        // 클릭한 카드가 현재 활성화된 운동일 경우 -> 설명 보기
+                        if (index === currentExerciseIndex) {
+                            openModal(exercise);
+                        } 
+                        // 클릭한 카드가 비활성화된 운동일 경우 -> 해당 운동으로 이동
+                        else {
+                            clearInterval(timerInterval);
+                            currentExerciseIndex = index;
+                            updateDisplay();
+                        }
+                    } 
+                    // 운동 시작 전일 때 -> 설명 보기 (미리보기)
+                    else {
+                        openModal(exercise);
                     }
                 });
                 routineList.appendChild(div);
@@ -193,15 +212,8 @@
         }
 
         function updateDisplay() {
-            document.querySelectorAll('.workout-card').forEach(card => {
-                card.classList.remove('active');
-                if (workoutInProgress) {
-                    card.classList.add('clickable');
-                } else {
-                    card.classList.remove('clickable');
-                }
-            });
-
+            document.querySelectorAll('.workout-card').forEach(card => card.classList.remove('active'));
+            
             if (currentExerciseIndex >= routine.length) {
                 workoutInProgress = false;
                 completionMessage.classList.remove('hidden');
@@ -209,17 +221,17 @@
                 nextBtn.classList.add('hidden');
                 startBtn.textContent = '다시 시작';
                 startBtn.classList.remove('hidden');
-                updateDisplay();
                 return;
             }
 
             const exercise = routine[currentExerciseIndex];
             const currentCard = document.getElementById(exercise.id);
-            if (currentCard) {
+            if(currentCard) {
                 currentCard.classList.add('active');
                 currentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
             currentExerciseTitle.textContent = exercise.name;
+
             if (exercise.type === 'time') {
                 timerContainer.classList.remove('hidden');
                 startTimer(exercise.count);
@@ -228,7 +240,7 @@
                 clearInterval(timerInterval);
             }
         }
-
+        
         function startTimer(duration) {
             let timeLeft = duration;
             clearInterval(timerInterval);
@@ -239,8 +251,7 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
-                    playBeep();
-                    setTimeout(() => nextBtn.click(), 500);
+                    nextBtn.click();
                 } else {
                     timeLeft--;
                 }
@@ -253,14 +264,14 @@
             const lastExercise = routine[currentExerciseIndex];
             currentExerciseIndex++;
 
-            if (lastExercise.id === 'main-5') { // 본운동 마지막
+            if (lastExercise.id === 'main-5') {
                 if (currentSet < totalSets) {
                     currentExerciseIndex = routine.findIndex(ex => ex.id === 'rest');
                 } else {
                     currentExerciseIndex = routine.findIndex(ex => ex.id === 'cooldown-1');
                 }
-            }
-            else if (lastExercise.id === 'rest') { // 휴식 끝
+            } 
+            else if (lastExercise.id === 'rest') {
                 currentSet++;
                 if (currentSet <= totalSets) {
                     currentSetInfo.textContent = `총 ${totalSets}세트 중 ${currentSet}세트 진행`;
@@ -270,6 +281,7 @@
             updateDisplay();
         }
 
+        // --- Event Listeners ---
         startBtn.addEventListener('click', () => {
             if (!workoutInProgress) {
                 workoutInProgress = true;
@@ -284,8 +296,15 @@
         });
 
         nextBtn.addEventListener('click', () => {
-            clearInterval(timerInterval);
-            nextExercise();
+             clearInterval(timerInterval);
+             nextExercise();
+        });
+
+        modalCloseBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
         });
 
         window.onload = () => {
@@ -293,5 +312,6 @@
         };
     </script>
 </body>
-
 </html>
+
+
