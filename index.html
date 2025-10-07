@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,42 +11,52 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+
         .workout-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
         }
+
         .workout-card.active {
             transform: translateY(-10px) scale(1.03);
             box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
             border-color: #3b82f6;
         }
+
         .timer-display {
             font-size: 4rem;
             line-height: 1;
         }
+
         .btn {
             transition: all 0.2s ease;
         }
+
         .btn:hover {
             transform: translateY(-2px);
         }
+
         .btn:active {
             transform: translateY(0);
         }
+
         /* Modal styles */
         .modal {
             transition: opacity 0.3s ease;
         }
+
         #modal-description ol {
             text-align: left;
             margin-left: 1.5rem;
             list-style-type: decimal;
         }
+
         #modal-description li {
             margin-bottom: 0.5rem;
         }
     </style>
 </head>
+
 <body class="bg-slate-50 text-slate-800">
 
     <div class="container mx-auto p-4 md:p-8 max-w-4xl">
@@ -63,18 +74,20 @@
                     <p id="current-set-info" class="text-slate-500">총 3세트 중 1세트 준비</p>
                 </div>
                 <div id="timer-container" class="hidden text-center">
-                     <div id="timer-display" class="timer-display font-bold text-slate-800">00:00</div>
+                    <div id="timer-display" class="timer-display font-bold text-slate-800">00:00</div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button id="start-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md">
+                    <button id="start-btn"
+                        class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md">
                         운동 시작
                     </button>
-                    <button id="next-btn" class="btn bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-lg shadow-md hidden">
+                    <button id="next-btn"
+                        class="btn bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-lg shadow-md hidden">
                         다음 운동
                     </button>
                 </div>
             </div>
-             <div id="completion-message" class="hidden mt-4 p-4 bg-green-100 text-green-800 rounded-lg text-center">
+            <div id="completion-message" class="hidden mt-4 p-4 bg-green-100 text-green-800 rounded-lg text-center">
                 <p class="font-bold text-lg">🎉 정말 대단해요! 오늘의 운동을 모두 완료했습니다!</p>
                 <p>꾸준함이 가장 중요합니다. 내일도 화이팅!</p>
             </div>
@@ -87,25 +100,31 @@
     </div>
 
     <!-- 상세 설명 Modal -->
-    <div id="exercise-modal" class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
-        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center transform scale-95 transition-transform max-h-[90vh] overflow-y-auto">
+    <div id="exercise-modal"
+        class="modal fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
+        <div
+            class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center transform scale-95 transition-transform max-h-[90vh] overflow-y-auto">
             <h3 id="modal-title" class="text-2xl font-bold mb-4 text-slate-800"></h3>
             <div id="modal-description" class="text-slate-600 mb-6"></div>
-            <button id="modal-close-btn" class="btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+            <button id="modal-close-btn"
+                class="btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
                 닫기
             </button>
         </div>
     </div>
 
     <script>
-        // --- 운동 데이터 정의 (상세 설명으로 변경) ---
+        // --- 운동 데이터 정의 (푸시업 강화 프로그램으로 변경) ---
         let routine = [
             { id: 'warmup-1', name: '준비운동: 고양이-소 자세', type: 'reps', count: '10회', description: '<ol><li>네 발 기기 자세를 만듭니다. (어깨 아래 손목, 골반 아래 무릎)</li><li>숨을 들이마시며 허리를 오목하게 만들고, 시선은 천장을 향합니다. (소 자세)</li><li>숨을 내쉬면서 등을 동그랗게 말아 올리고, 시선은 배꼽을 향합니다. (고양이 자세)</li><li>이 두 동작을 부드럽게 반복하며 척추를 풀어줍니다.</li></ol>' },
             { id: 'warmup-2', name: '준비운동: 레그 스윙', type: 'reps', count: '좌/우 각 10회', description: '<ol><li>벽이나 의자를 잡고 균형을 잡습니다.</li><li>한쪽 다리를 앞뒤로 그네처럼 부드럽게 흔들어줍니다.</li><li>점점 범위를 넓혀 고관절이 풀리는 것을 느낍니다.</li><li>반대쪽 다리도 똑같이 반복합니다.</li></ol>' },
             { id: 'warmup-3', name: '준비운동: 몸통 비틀기', type: 'reps', count: '20회', description: '<ol><li>다리를 어깨너비로 벌리고 편안하게 섭니다.</li><li>양팔에 힘을 빼고, 몸통을 좌우로 부드럽게 회전시킵니다.</li><li>팔이 몸통을 자연스럽게 감싸도록 움직이며 코어를 예열합니다.</li></ol>' },
             { id: 'warmup-4', name: '준비운동: 제자리 뛰기', type: 'time', count: 60, description: '<ol><li>가볍게 제자리에서 달리기를 시작합니다.</li><li>몸에 열이 나고 심박수가 서서히 오르는 것을 느낍니다.</li></ol>' },
             { id: 'main-1', name: '템포 스쿼트', type: 'reps', count: '20회', description: '<ol><li>발을 어깨너비로 벌리고 섭니다.</li><li>(하나, 둘, 셋) 3초 동안 천천히 허벅지가 바닥과 평행이 될 때까지 앉습니다.</li><li>(넷) 가장 낮은 자세에서 1초간 완벽하게 멈춥니다.</li><li>(다섯) 1초 만에 폭발적으로 일어나 시작 자세로 돌아옵니다. 허리가 아닌 엉덩이와 허벅지 힘에 집중하세요.</li></ol>' },
-            { id: 'main-2', name: '정자세 푸시업', type: 'reps', count: '10회', description: '<ol><li>손을 어깨보다 조금 넓게 짚고, 머리부터 발끝까지 일직선을 만듭니다.</li><li>복부에 힘을 줘 허리가 처지지 않도록 유지합니다.</li><li>가슴이 바닥에 닿기 직전까지 팔을 굽혀 내려갑니다.</li><li>바닥을 강하게 밀어 시작 자세로 돌아옵니다.</li></ol>' },
+            // --- [수정됨] 푸시업 강화 프로그램 ---
+            { id: 'main-pushup-1', name: '푸시업 강화: 인클라인 푸시업', type: 'reps', count: '실패 지점까지', description: '<ol><li>책상이나 의자처럼 튼튼하고 안정적인 곳에 손을 어깨너비보다 조금 넓게 짚습니다. (높이가 높을수록 쉬워집니다.)</li><li>머리부터 발끝까지 몸을 일직선으로 만듭니다. 복부에 힘을 줘 허리가 꺾이지 않게 하세요.</li><li>가슴이 손을 짚은 곳에 가까워질 때까지 팔꿈치를 굽혀 천천히 내려갑니다.</li><li>가슴 근육을 이용해 바닥을 강하게 밀어 시작 자세로 돌아옵니다.</li><li>더 이상 정자세로 1개도 못할 때까지 반복합니다.</li></ol>' },
+            { id: 'main-pushup-2', name: '푸시업 강화: 네거티브 푸시업', type: 'reps', count: '5~8회', description: '<ol><li>바닥에서 정자세 푸시업 준비 자세를 취합니다.</li><li>(하나, 둘, 셋, 넷, 다섯) 5초에 걸쳐 아주 천천히, 버티면서 가슴이 바닥에 닿을 때까지 내려옵니다.</li><li>가슴이 바닥에 완전히 닿으면, 힘을 빼고 편하게 엎드립니다.</li><li>밀어 올릴 때는 힘쓰지 말고, 무릎을 바닥에 대고 편하게 시작 자세로 돌아옵니다.</li><li>내려오는 동작의 자극에만 집중하며 반복합니다.</li></ol>' },
+            { id: 'main-pushup-3', name: '푸시업 강화: 벤치 딥스', type: 'reps', count: '실패 지점까지', description: '<ol><li>튼튼한 의자나 소파 끝에 손을 어깨너비로 짚습니다. 손가락은 앞을 향하게 하세요.</li><li>다리를 앞으로 뻗고 엉덩이를 의자에서 뗍니다. (무릎을 구부리면 쉬워집니다.)</li><li>팔꿈치가 90도 각도가 될 때까지 몸을 수직으로 천천히 내립니다.</li><li>어깨가 아닌, 팔 뒤쪽(삼두근)의 힘으로 몸을 강하게 밀어 올려 시작 자세로 돌아옵니다.</li><li>더 이상 1개도 못할 때까지 반복합니다.</li></ol>' },
             { id: 'main-3', name: '플랭크', type: 'time', count: 30, description: '<ol><li>팔꿈치를 어깨 바로 아래에 두고 바닥에 댑니다.</li><li>머리부터 발끝까지 몸이 일직선이 되도록 합니다.</li><li>엉덩이가 솟거나 처지지 않도록 복부와 엉덩이에 강하게 힘을 주고 버팁니다.</li><li>숨을 참지 말고 편안하게 호흡합니다.</li></ol>' },
             { id: 'main-back-1', name: '슈퍼맨', type: 'reps', count: '15회', description: '<ol><li>바닥에 배를 대고 엎드려 양팔을 앞으로 뻗습니다.</li><li>숨을 내쉬면서 팔과 다리를 동시에 들어 올립니다.</li><li>허리 힘보다는 등과 엉덩이 근육을 조이는 느낌에 집중합니다.</li><li>최고 지점에서 1~2초 멈춘 후 천천히 내려옵니다.</li></ol>' },
             { id: 'main-back-2', name: '브릿지', type: 'reps', count: '15회', description: '<ol><li>바닥에 누워 무릎을 세웁니다.</li><li>숨을 내쉬면서 엉덩이를 들어 올려 어깨부터 무릎까지 일직선을 만듭니다.</li><li>최고 지점에서 엉덩이를 강하게 조여 1~2초 멈춥니다.</li><li>허리가 과하게 꺾이지 않도록 주의하며 천천히 내려옵니다.</li></ol>' },
@@ -143,7 +162,7 @@
         // --- Modal 함수 ---
         function openModal(exercise) {
             modalTitle.textContent = exercise.name;
-            modalDescription.innerHTML = exercise.description;
+            modalDescription.innerHTML = exercise.description; // 상세 설명(HTML)을 그대로 삽입
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.querySelector('div').classList.remove('scale-95');
         }
@@ -152,12 +171,12 @@
             modal.classList.add('opacity-0', 'pointer-events-none');
             modal.querySelector('div').classList.add('scale-95');
         }
-        
+
         // 운동 목록 렌더링 함수
         function renderRoutine() {
             routineList.innerHTML = '';
             let sectionTitle = '';
-            
+
             routine.forEach((exercise, index) => {
                 let currentSection = '';
                 if (exercise.id.startsWith('warmup')) currentSection = '준비운동';
@@ -176,7 +195,7 @@
                 const div = document.createElement('div');
                 div.id = exercise.id;
                 div.className = 'workout-card bg-white p-5 rounded-xl border-2 border-transparent shadow-sm hover:shadow-lg hover:border-blue-500';
-                
+
                 const briefDescription = exercise.description.includes('<li>') ? exercise.description.split('<li>')[1].split('</li>')[0] : exercise.description;
 
                 div.innerHTML = `
@@ -186,23 +205,18 @@
                     </div>
                     <p class="text-slate-600 mt-2 truncate">${briefDescription}</p>
                 `;
-                
-                // --- [수정됨] 스마트 클릭 이벤트 리스너 ---
+
                 div.addEventListener('click', () => {
-                    // 운동 진행 중일 때
                     if (workoutInProgress) {
-                        // 클릭한 카드가 현재 활성화된 운동일 경우 -> 설명 보기
                         if (index === currentExerciseIndex) {
                             openModal(exercise);
-                        } 
-                        // 클릭한 카드가 비활성화된 운동일 경우 -> 해당 운동으로 이동
+                        }
                         else {
                             clearInterval(timerInterval);
                             currentExerciseIndex = index;
                             updateDisplay();
                         }
-                    } 
-                    // 운동 시작 전일 때 -> 설명 보기 (미리보기)
+                    }
                     else {
                         openModal(exercise);
                     }
@@ -213,7 +227,7 @@
 
         function updateDisplay() {
             document.querySelectorAll('.workout-card').forEach(card => card.classList.remove('active'));
-            
+
             if (currentExerciseIndex >= routine.length) {
                 workoutInProgress = false;
                 completionMessage.classList.remove('hidden');
@@ -226,7 +240,7 @@
 
             const exercise = routine[currentExerciseIndex];
             const currentCard = document.getElementById(exercise.id);
-            if(currentCard) {
+            if (currentCard) {
                 currentCard.classList.add('active');
                 currentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
@@ -240,7 +254,7 @@
                 clearInterval(timerInterval);
             }
         }
-        
+
         function startTimer(duration) {
             let timeLeft = duration;
             clearInterval(timerInterval);
@@ -270,7 +284,7 @@
                 } else {
                     currentExerciseIndex = routine.findIndex(ex => ex.id === 'cooldown-1');
                 }
-            } 
+            }
             else if (lastExercise.id === 'rest') {
                 currentSet++;
                 if (currentSet <= totalSets) {
@@ -296,8 +310,8 @@
         });
 
         nextBtn.addEventListener('click', () => {
-             clearInterval(timerInterval);
-             nextExercise();
+            clearInterval(timerInterval);
+            nextExercise();
         });
 
         modalCloseBtn.addEventListener('click', closeModal);
@@ -312,6 +326,47 @@
         };
     </script>
 </body>
+
 </html>
+```
+
+---
+
+### 푸시업 강화 프로그램: 상세 자세 설명
+
+웹페이지 팝업창에서도 확인 가능하지만, 언제든 참고하실 수 있도록 다시 한번 상세히 설명해 드릴게요.
+
+#### 1. 인클라인 푸시업 (가슴 전체 근력)
+
+정자세 푸시업과 같은 자세를, 더 쉬운 각도에서 반복하며 근력의 기본기를 다지는 운동입니다.
+
+* **자세:**
+1. 책상이나 의자처럼 튼튼하고 안정적인 곳에 손을 어깨너비보다 조금 넓게 짚습니다. (높이가 높을수록 쉬워집니다.)
+2. 머리부터 발끝까지 몸을 **완벽한 일직선**으로 만듭니다. 복부에 힘을 줘 허리가 꺾이지 않게 하세요.
+3. 가슴이 손을 짚은 곳에 가까워질 때까지 팔꿈치를 굽혀 천천히 내려갑니다.
+4. 가슴 근육을 이용해 바닥을 강하게 밀어 시작 자세로 돌아옵니다.
+* **목표:** 더 이상 정자세로 1개도 못할 때까지 반복합니다. (실패 지점)
 
 
+
+#### 2. 네거티브 푸시업 (버티는 힘)
+
+내려오는 동작(이완 수축)에 집중해 근섬유에 강력한 자극을 주는, 정체기 탈출의 핵심 훈련입니다.
+
+* **자세:**
+1. 바닥에서 정자세 푸시업 준비 자세를 취합니다.
+2. 마음속으로 **5초를 세면서 (하나, 둘, 셋, 넷, 다섯)**, 아주 천천히 버티면서 가슴이 바닥에 닿을 때까지 내려옵니다.
+3. 가슴이 바닥에 완전히 닿으면, 힘을 빼고 편하게 엎드립니다.
+4. **밀어 올릴 때는 힘쓰지 말고, 무릎을 바닥에 대고 편하게** 시작 자세로 돌아옵니다.
+* **목표:** 5~8회 반복. 횟수보다 '천천히 버티는 것'이 중요합니다.
+
+#### 3. 벤치 딥스 (밀어내는 힘)
+
+푸시업의 마지막 구간, 즉 팔을 쭉 펴서 밀어 올릴 때 가장 중요한 팔 뒤쪽(삼두근) 근육을 직접적으로 강화합니다.
+
+* **자세:**
+1. 튼튼한 의자나 소파 끝에 손을 어깨너비로 짚습니다. 손가락은 앞을 향하게 하세요.
+2. 다리를 앞으로 뻗고 엉덩이를 의자에서 뗍니다. (이때 무릎을 구부리면 더 쉬워집니다.)
+3. 팔꿈치가 90도 각도가 될 때까지 몸을 수직으로 천천히 내립니다.
+4. 어깨가 아닌, **팔 뒤쪽(삼두근)의 힘으로** 몸을 강하게 밀어 올려 시작 자세로 돌아옵니다.
+* **목표:** 더 이상 1개도 못할 때까지 반복합니다. (실패 지점)
